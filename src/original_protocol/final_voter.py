@@ -2,7 +2,37 @@ import secrets
 import socket
 import threading
 
-class FinalVoter():
+class FinalVoter:
+    """
+    A class to represent the final voter in the secure voting protocol.
+
+    Attributes:
+    -----------
+    number_of_voters : int
+        The total number of voters.
+    vote : int
+        The final voter's vote (0 or 1).
+    port : int
+        The port number for the final voter server.
+    tallier_port : int
+        The port number for connecting to the tallier.
+    masking_values : list
+        A list to store masking values received from other voters.
+    lock : threading.Lock
+        A lock to ensure thread-safe operations on masking_values.
+
+    Methods:
+    --------
+    generate_masking_value():
+        Generates the masking value by XORing all received masking values.
+    mask_vote(masking_value):
+        Masks the final voter's vote using the masking value.
+    start_server():
+        Starts the server to receive masking values from other voters.
+    run():
+        Runs the final voter
+    """
+
     def __init__(self, number_of_voters, vote, port, tallier_port):
         self.number_of_voters = number_of_voters
         self.vote = vote
@@ -12,12 +42,33 @@ class FinalVoter():
         self.lock = threading.Lock()
 
     def generate_masking_value(self):
+        """
+        Generates the masking value by XORing all received masking values.
+
+        Returns:
+        --------
+        int
+            The combined masking value.
+        """
         masking_value = 0
         for value in self.masking_values:
             masking_value ^= value
         return masking_value
 
     def mask_vote(self, masking_value):
+        """
+        Masks the final voter's vote using the masking value.
+
+        Parameters:
+        -----------
+        masking_value : int
+            The combined masking value.
+
+        Returns:
+        --------
+        int
+            The masked vote.
+        """
         if self.vote == 0:
             vote = 0
         else:
@@ -25,11 +76,14 @@ class FinalVoter():
         return vote ^ masking_value
 
     def start_server(self):
+        """
+        Starts the server to receive masking values from other voters.
+        """
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('localhost', self.port))
         server_socket.listen(self.number_of_voters)
 
-        while len(self.masking_values) < self.number_of_voters-1:
+        while len(self.masking_values) < self.number_of_voters - 1:
             client_socket, addr = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
@@ -37,6 +91,9 @@ class FinalVoter():
             client_socket.close()
 
     def run(self):
+        """
+        Runs the final voter.
+        """
         self.start_server()
         masking_value = self.generate_masking_value()
 

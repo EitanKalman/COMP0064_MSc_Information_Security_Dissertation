@@ -1,18 +1,20 @@
 import secrets
 import threading
 from functools import reduce
-
-from tallier import Tallier
-from voter import Voter
-from final_voter import FinalVoter
 from random import randint
 
-def main():
+from final_voter import FinalVoter
+from tallier import Tallier
+from voter import Voter
 
-    k_0 = secrets.token_bytes(32)  # Random key for PRF
+
+def main():
+    """Run the original efficient protocol"""
+    k_0 = secrets.token_bytes(32)  # Random shared key for PRF
     final_voter_port = 65433
     tallier_port = 65432
 
+    # Create the desired number of Voters
     number_of_voters = 10
     voters = []
     votes = []
@@ -47,11 +49,12 @@ def main():
     for thread in voter_threads:
         thread.join()
 
-    # Wait for the Tallier to collect all encoded verdicts
+    # Wait for the Tallier to collect all encoded verdicts and get the final verdict
     tallier_thread.join()
     final_verdict = tallier.get_final_verdict()
     print(f"Final verdict: {final_verdict}")
 
+    # Calculate the correct final verdict to verify that the Tallier is correct
     combined_votes = reduce(lambda x,y: x^y, votes)
     print(f"Combined votes: {combined_votes}")
     print(f"Votes: {votes}")
