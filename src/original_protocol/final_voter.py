@@ -33,7 +33,7 @@ class FinalVoter:
         Runs the final voter
     """
 
-    def __init__(self, number_of_voters, vote, port, tallier_port):
+    def __init__(self, number_of_voters: int, vote: int, port: int, tallier_port: int) -> None:
         self.number_of_voters = number_of_voters
         self.vote = vote
         self.port = port
@@ -41,7 +41,7 @@ class FinalVoter:
         self.masking_values = []
         self.lock = threading.Lock()
 
-    def generate_masking_value(self):
+    def generate_masking_value(self) -> int:
         """
         Generates the masking value by XORing all received masking values.
 
@@ -55,7 +55,7 @@ class FinalVoter:
             masking_value ^= value
         return masking_value
 
-    def mask_vote(self, masking_value):
+    def mask_vote(self, masking_value: int) -> int:
         """
         Masks the final voter's vote using the masking value.
 
@@ -75,7 +75,7 @@ class FinalVoter:
             vote = secrets.randbelow(2**256)  # Random value in F_p
         return vote ^ masking_value
 
-    def start_server(self):
+    def start_server(self) -> None:
         """
         Starts the server to receive masking values from other voters.
         """
@@ -90,7 +90,7 @@ class FinalVoter:
                 self.masking_values.append(int(data.decode()))
             client_socket.close()
 
-    def run(self):
+    def run(self) -> None:
         """
         Runs the final voter.
         """

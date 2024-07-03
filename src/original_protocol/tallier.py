@@ -30,7 +30,7 @@ class Tallier:
         Returns the final verdict after all votes have been processed.
     """
 
-    def __init__(self, number_of_voters, port):
+    def __init__(self, number_of_voters: int, port: int) -> None:
         """
         Constructs all the necessary attributes for the Tallier object.
 
@@ -47,7 +47,7 @@ class Tallier:
         self.lock = threading.Lock()
         self.final_verdict = None
 
-    def start_server(self):
+    def start_server(self) -> None:
         """
         Starts the server to receive encoded votes from voters.
         """
@@ -62,7 +62,7 @@ class Tallier:
                 self.encoded_verdicts.append(int(data.decode()))
             client_socket.close()
 
-    def FVD(self):
+    def FVD(self) -> int:
         """
         Combines all encoded votes and determines the final verdict.
 
@@ -77,14 +77,14 @@ class Tallier:
         final_verdict = 0 if combined_votes == 0 else 1
         return final_verdict
 
-    def run(self):
+    def run(self) -> None:
         """
         Runs the tallier's operations including starting the server and computing the final verdict.
         """
         self.start_server()
         self.final_verdict = self.FVD()
 
-    def get_final_verdict(self):
+    def get_final_verdict(self) -> int:
         """
         Returns the final verdict after all votes have been processed.
 

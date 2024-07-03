@@ -35,7 +35,7 @@ class Voter:
         Runs the voter's operations including sending the masking value and encoded vote.
     """
 
-    def __init__(self, key, ID, voter_index, vote, offset, final_voter_port, tallier_port):
+    def __init__(self, key: bytes, ID: str, voter_index: int, vote: int, offset: int, final_voter_port: int, tallier_port: int) -> None:
         self.key = key
         self.ID = ID
         self.voter_index = voter_index
@@ -44,7 +44,7 @@ class Voter:
         self.final_voter_port = final_voter_port
         self.tallier_port = tallier_port
 
-    def PRF(self, k, val):
+    def PRF(self, k: bytes, val: str) -> int:
         """
         Pseudo Random Function (PRF) implementation using SHA-256.
 
@@ -62,7 +62,7 @@ class Voter:
         """
         return int(sha256((str(k) + str(val)).encode()).hexdigest(), 16) % 2**256
 
-    def generate_masking_value(self):
+    def generate_masking_value(self) -> int:
         """
         Generates the masking value for the voter.
 
@@ -73,7 +73,7 @@ class Voter:
         """
         return self.PRF(self.key, f'{self.offset}{self.voter_index}{self.ID}')
 
-    def mask_vote(self, masking_value):
+    def mask_vote(self, masking_value: int) -> int:
         """
         Masks the voter's vote using the masking value.
 
@@ -93,7 +93,7 @@ class Voter:
             vote = secrets.randbelow(2**256)  # Random value in F_p
         return vote ^ masking_value
 
-    def run(self):
+    def run(self)  -> None:
         """
         Runs the voter's operations including sending the masking value and encoded vote.
         """
