@@ -62,7 +62,7 @@ class Tallier:
                 self.encoded_verdicts.append(int(data.decode()))
             client_socket.close()
 
-    def FVD(self) -> int:
+    def fvd(self) -> int:
         """
         Combines all encoded votes and determines the final verdict.
 
@@ -82,7 +82,7 @@ class Tallier:
         Runs the tallier's operations including starting the server and computing the final verdict.
         """
         self.start_server()
-        self.final_verdict = self.FVD()
+        self.final_verdict = self.fvd()
 
     def get_final_verdict(self) -> int:
         """
