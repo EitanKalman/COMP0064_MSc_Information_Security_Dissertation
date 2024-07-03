@@ -55,7 +55,7 @@ def main() -> None:
     print(f"Final verdict: {final_verdict}")
 
     # Calculate the correct final verdict to verify that the Tallier is correct
-    combined_votes: int = reduce(lambda x,y: x^y, votes)
+    combined_votes = 1 if 1 in votes else 0
     print(f"Combined votes: {combined_votes}")
     print(f"Votes: {votes}")
 
