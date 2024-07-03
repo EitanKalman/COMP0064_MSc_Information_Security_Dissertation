@@ -8,7 +8,6 @@ from final_voter import FinalVoter
 from tallier import Tallier
 from voter import Voter
 
-
 def main() -> None:
     """Run the original efficient protocol"""
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF
