@@ -7,6 +7,7 @@ class Tallier:
         self.port = port
         self.encoded_verdicts = []
         self.lock = threading.Lock()
+        self.final_verdict = None
 
     def start_server(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,5 +30,7 @@ class Tallier:
 
     def run(self):
         self.start_server()
-        final_verdict = self.FVD()
-        print(f"Final Verdict is: {final_verdict}")
+        self.final_verdict = self.FVD()
+
+    def get_final_verdict(self):
+        return self.final_verdict
