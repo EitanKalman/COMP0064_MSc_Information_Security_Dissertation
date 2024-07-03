@@ -35,9 +35,9 @@ class Voter:
         Runs the voter's operations including sending the masking value and encoded vote.
     """
 
-    def __init__(self, key: bytes, id: str, voter_index: int, vote: int, offset: int, final_voter_port: int, tallier_port: int) -> None:
+    def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int, final_voter_port: int, tallier_port: int) -> None:
         self.key = key
-        self.id = id
+        self.voter_id = voter_id
         self.voter_index = voter_index
         self.vote = vote
         self.offset = offset
@@ -71,7 +71,7 @@ class Voter:
         int
             The masking value.
         """
-        return self.prf(self.key, f'{self.offset}{self.voter_index}{self.id}')
+        return self.prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
 
     def mask_vote(self, masking_value: int) -> int:
         """
