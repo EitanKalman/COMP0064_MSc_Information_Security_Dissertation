@@ -74,15 +74,14 @@ class Tallier:
         combined_votes = 0
         for encoded_vote in self.encoded_verdicts:
             combined_votes ^= encoded_vote
-        final_verdict = 0 if combined_votes == 0 else 1
-        return final_verdict
+        self.final_verdict = 0 if combined_votes == 0 else 1
 
     def run(self) -> None:
         """
         Runs the tallier's operations including starting the server and computing the final verdict.
         """
         self.start_server()
-        self.final_verdict = self.fvd()
+        self.fvd()
 
     def get_final_verdict(self) -> int:
         """
