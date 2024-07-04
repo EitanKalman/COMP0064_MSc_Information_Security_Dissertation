@@ -1,6 +1,7 @@
 import socket
 import secrets
-from hashlib import sha256
+
+from src.helpers import prf
 
 class Voter:
     """
@@ -44,24 +45,6 @@ class Voter:
         self.final_voter_port = final_voter_port
         self.tallier_port = tallier_port
 
-    def prf(self, k: bytes, val: str) -> int:
-        """
-        Pseudo Random Function (PRF) implementation using SHA-256.
-
-        Parameters:
-        -----------
-        k : bytes
-            The key for the PRF.
-        val : str
-            The value to be hashed with the key.
-
-        Returns:
-        --------
-        int
-            The PRF output as an integer.
-        """
-        return int(sha256((str(k) + str(val)).encode()).hexdigest(), 16) % 2**256
-
     def generate_masking_value(self) -> int:
         """
         Generates the masking value for the voter.
@@ -71,7 +54,7 @@ class Voter:
         int
             The masking value.
         """
-        return self.prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
+        return prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
 
     def mask_vote(self, masking_value: int) -> int:
         """
