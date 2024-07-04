@@ -1,11 +1,11 @@
-import secrets
 import json
 import socket
 import threading
-from hashlib import sha256
 import itertools
 
-from bloom_filter import BloomFilter
+from src.original_protocol.generic.bloom_filter import BloomFilter
+from src.helpers import prf
+
 
 class FinalVoter:
     """
@@ -51,24 +51,6 @@ class FinalVoter:
         self.masking_values = []
         self.lock = threading.Lock()
 
-    def prf(self, k: bytes, val: str) -> int:
-        """
-        Pseudo Random Function (PRF) implementation using SHA-256.
-
-        Parameters:
-        -----------
-        k : bytes
-            The key for the PRF.
-        val : str
-            The value to be hashed with the key.
-
-        Returns:
-        --------
-        int
-            The PRF output as an integer.
-        """
-        return int(sha256((str(k) + str(val)).encode()).hexdigest(), 16) % 2**256
-
     def generate_masking_value(self) -> int:
         """
         Generates the masking value by XORing all received masking values.
@@ -100,7 +82,7 @@ class FinalVoter:
         if self.vote == 0:
             vote = 0
         else:
-            vote = self.prf(self.key, f"2{self.offset}{self.voter_index}{self.voter_id}")
+            vote = prf(self.key, f"2{self.offset}{self.voter_index}{self.voter_id}")
         return vote ^ masking_value
 
     def create_bloom_filter(self):
@@ -108,7 +90,7 @@ class FinalVoter:
         vote_representations=[]
 
         for i in range(0, self.number_of_voters):
-            vote_rep = self.prf(self.key, f"2{self.offset}{i}voter{i}")
+            vote_rep = prf(self.key, f"2{self.offset}{i}voter{i}")
             vote_representations.append(vote_rep)
 
         for i in range(self.threshold, self.number_of_voters+1):
@@ -151,11 +133,5 @@ class FinalVoter:
                         'vote': encoded_vote,
                         'bf': bloom_filter.to_dict()
                         }
-        # print(f"sending: {json.dumps(message).encode('utf-8')}")
         client_socket.sendall(json.dumps(message).encode('utf-8'))
-
-        # bf_message = {'type': 'bloom_filter', 'content': bloom_filter.to_dict()}
-        # print(f"sending: {json.dumps(bf_message).encode('utf-8')}")
-        # client_socket.sendall(json.dumps(bf_message).encode('utf-8'))
-        
         client_socket.close()

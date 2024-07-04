@@ -2,7 +2,7 @@ import json
 import socket
 import threading
 
-from bloom_filter import BloomFilter
+from src.original_protocol.generic.bloom_filter import BloomFilter
 
 class Tallier:
     """
@@ -57,7 +57,7 @@ class Tallier:
             self.encoded_votes.append(message['content'])
         elif message['type'] == 'vote_bf':
             self.encoded_votes.append(message['vote'])
-            self.bloom_filter = BloomFilter.from_dict(message['bf'])         
+            self.bloom_filter = BloomFilter.from_dict(message['bf'])
 
     def start_server(self) -> None:
         """

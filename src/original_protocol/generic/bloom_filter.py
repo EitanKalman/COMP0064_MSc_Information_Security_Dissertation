@@ -1,6 +1,8 @@
-from bitarray import bitarray
+from math import ceil, log
+
 import mmh3
-from math import log, ceil
+from bitarray import bitarray
+
 
 class BloomFilter:
     def __init__(self, number_of_elements: int) -> None:

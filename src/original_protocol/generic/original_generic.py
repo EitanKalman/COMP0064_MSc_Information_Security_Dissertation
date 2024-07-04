@@ -3,20 +3,19 @@ import threading
 from random import randint
 from typing import List
 
-# from final_voter import FinalVoter
-from final_voter import FinalVoter
-from tallier import Tallier
-from voter import Voter
+from src.original_protocol.generic.final_voter import FinalVoter
+from src.original_protocol.generic.tallier import Tallier
+from src.original_protocol.generic.voter import Voter
 
-def main() -> None:
+def original_generic(number_of_voters: int, threshold: int) -> None:
     """Run the original efficient protocol"""
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF
     final_voter_port: int = 65433
     tallier_port: int = 65432
 
     # Create the desired number of Voters
-    number_of_voters = 10
-    threshold = 6
+    # number_of_voters = 10
+    # threshold = 6
     voters: List[Voter] = []
     votes: List[int] = []
     for i in range(number_of_voters-1):
@@ -59,7 +58,3 @@ def main() -> None:
     one_votes : int = votes.count(1)
     print(f"Above threshold? {one_votes >= threshold}")
     print(f"Votes: {votes}")
-
-    
-if __name__ == "__main__":
-    main()
