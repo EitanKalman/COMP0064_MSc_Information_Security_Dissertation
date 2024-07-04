@@ -1,6 +1,5 @@
 import secrets
 import threading
-from functools import reduce
 from random import randint
 from typing import List
 
@@ -33,7 +32,7 @@ def main() -> None:
     # Create the FinalVoter
     final_voter_vote: int = randint(0,1)
     votes.append(final_voter_vote)
-    final_voter = FinalVoter(k_0, "final_voter", number_of_voters-1, 0, 0, 6, number_of_voters, final_voter_port, tallier_port)
+    final_voter = FinalVoter(k_0, f"voter{number_of_voters-1}", number_of_voters-1, final_voter_vote, 0, threshold, number_of_voters, final_voter_port, tallier_port)
     final_voter_thread= threading.Thread(target=final_voter.run)
 
     # Start the Tallier and FinalVoter servers in separate threads
@@ -55,6 +54,11 @@ def main() -> None:
     tallier_thread.join()
     final_verdict: int = tallier.get_final_verdict()
     print(f"Final verdict: {final_verdict}")
+
+    # Calculate the correct final verdict to verify that the Tallier is correct
+    one_votes : int = votes.count(1)
+    print(f"Above threshold? {one_votes >= threshold}")
+    print(f"Votes: {votes}")
 
     
 if __name__ == "__main__":

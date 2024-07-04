@@ -3,6 +3,9 @@ import json
 import socket
 import threading
 from hashlib import sha256
+import itertools
+
+from bloom_filter import BloomFilter
 
 class FinalVoter:
     """
@@ -101,7 +104,20 @@ class FinalVoter:
         return vote ^ masking_value
 
     def create_bloom_filter(self):
-        return None
+        bloom_filter = BloomFilter(self.number_of_voters)
+        vote_representations=[]
+
+        for i in range(0, self.number_of_voters):
+            vote_rep = self.prf(self.key, f"2{self.offset}{i}voter{i}")
+            vote_representations.append(vote_rep)
+
+        for i in range(self.threshold, self.number_of_voters+1):
+            for comb in itertools.combinations(vote_representations, i):
+                xor = 0
+                for rep in comb:
+                    xor ^= rep
+                bloom_filter.add(xor)
+        return bloom_filter
 
     def start_server(self) -> None:
         """
@@ -126,10 +142,20 @@ class FinalVoter:
         masking_value = self.generate_masking_value()
 
         encoded_vote = self.mask_vote(masking_value)
-        # bloom_filter = self.create_bloom_filter()
+        bloom_filter = self.create_bloom_filter()
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
-        message = {'type': 'vote', 'content': encoded_vote}
+
+        message = {'type': 'vote_bf',
+                        'vote': encoded_vote,
+                        'bf': bloom_filter.to_dict()
+                        }
+        # print(f"sending: {json.dumps(message).encode('utf-8')}")
         client_socket.sendall(json.dumps(message).encode('utf-8'))
+
+        # bf_message = {'type': 'bloom_filter', 'content': bloom_filter.to_dict()}
+        # print(f"sending: {json.dumps(bf_message).encode('utf-8')}")
+        # client_socket.sendall(json.dumps(bf_message).encode('utf-8'))
+        
         client_socket.close()

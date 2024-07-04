@@ -2,6 +2,8 @@ import json
 import socket
 import threading
 
+from bloom_filter import BloomFilter
+
 class Tallier:
     """
     A class to represent the tallier in the secure voting protocol.
@@ -48,12 +50,14 @@ class Tallier:
         self.lock = threading.Lock()
         self.bloom_filter = None
         self.final_verdict = None
+        self.bloom_filter = None
 
     def process_message(self, message):
         if message['type'] == 'vote':
             self.encoded_votes.append(message['content'])
-        else:
-            print("Received something other than a vote")
+        elif message['type'] == 'vote_bf':
+            self.encoded_votes.append(message['vote'])
+            self.bloom_filter = BloomFilter.from_dict(message['bf'])         
 
     def start_server(self) -> None:
         """
@@ -63,12 +67,15 @@ class Tallier:
         server_socket.bind(('localhost', self.port))
         server_socket.listen(self.number_of_voters)
 
-        while len(self.encoded_votes) < self.number_of_voters:
+        received_msg = 0
+
+        while received_msg < self.number_of_voters:
             client_socket, addr = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
                 message = json.loads(data.decode('utf-8'))
                 self.process_message(message)
+                received_msg +=1
             client_socket.close()
 
     def gfvd(self) -> int:
@@ -84,7 +91,12 @@ class Tallier:
         for encoded_vote in self.encoded_votes:
             combined_votes ^= encoded_vote
 
-        # If combined_votes=0 or combined_votes not in bloom filter: self.final_verdict = 0; else: self.final_verdict = 1
+        #If the combined vote is in the bloom filter, set the final verdict to 1, otherwise 0
+        if self.bloom_filter.check(combined_votes):
+            self.final_verdict = 1
+        else:
+            self.final_verdict = 0
+
 
     def run(self) -> None:
         """
