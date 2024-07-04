@@ -1,4 +1,5 @@
 import secrets
+import json
 import socket
 import threading
 from hashlib import sha256
@@ -125,10 +126,10 @@ class FinalVoter:
         masking_value = self.generate_masking_value()
 
         encoded_vote = self.mask_vote(masking_value)
-
-        bloom_filter = self.create_bloom_filter()
+        # bloom_filter = self.create_bloom_filter()
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
-        client_socket.sendall(str(encoded_vote).encode())
+        message = {'type': 'vote', 'content': encoded_vote}
+        client_socket.sendall(json.dumps(message).encode('utf-8'))
         client_socket.close()

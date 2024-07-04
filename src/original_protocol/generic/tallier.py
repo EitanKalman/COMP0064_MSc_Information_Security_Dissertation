@@ -1,3 +1,4 @@
+import json
 import socket
 import threading
 
@@ -48,6 +49,12 @@ class Tallier:
         self.bloom_filter = None
         self.final_verdict = None
 
+    def process_message(self, message):
+        if message['type'] == 'vote':
+            self.encoded_votes.append(message['content'])
+        else:
+            print("Received something other than a vote")
+
     def start_server(self) -> None:
         """
         Starts the server to receive encoded votes from voters.
@@ -60,7 +67,8 @@ class Tallier:
             client_socket, addr = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
-                self.encoded_votes.append(int(data.decode()))
+                message = json.loads(data.decode('utf-8'))
+                self.process_message(message)
             client_socket.close()
 
     def gfvd(self) -> int:
