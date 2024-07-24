@@ -1,2 +1,4 @@
 bitarray==2.9.2
 mmh3==4.1.0
+pycryptodome==3.20.0
+sympy==1.13.1
