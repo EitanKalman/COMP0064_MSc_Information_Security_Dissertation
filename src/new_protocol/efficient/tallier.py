@@ -2,8 +2,9 @@ import json
 import socket
 import threading
 import multiprocessing
+import time
 
-from src.new_protocol.efficient.time_lock_solver import TimeLockSolver
+from Crypto.Cipher import ChaCha20
 
 class Tallier:
     """
@@ -52,6 +53,21 @@ class Tallier:
         self.unlocking_processes = []
         self.final_verdict = None
 
+    def unlock(self, n, a, t, CK, CM, nonce):
+        first_time = time.perf_counter()
+        nonce = int.to_bytes(nonce, length=8)
+        ciphertext = int.to_bytes(CM, length=32)
+        x = a
+        for _ in range(1, t+1):
+            x = (x**2) % n
+        b = x
+        second_time = time.perf_counter()
+        print(f"time taken: {second_time-first_time}")
+        K = int.to_bytes(CK - b, length=32)
+        cipher = ChaCha20.new(key=K, nonce=nonce)
+        plaintext = cipher.decrypt(ciphertext)
+        return int.from_bytes(plaintext)
+
     def unlock_message(self, message):
         n = message['n']
         a = message['a']
@@ -59,10 +75,7 @@ class Tallier:
         CK = message['CK']
         CM = message['CM']
         nonce = message['nonce']
-        time_lock_solver = TimeLockSolver(n, a, t, CK, CM, nonce)
-
-        unlocked_verdict = time_lock_solver.unlock()
-
+        unlocked_verdict = self.unlock(n, a, t, CK, CM, nonce)
         print(f"unlocked vote: {unlocked_verdict}")
         self.encoded_verdicts.append(unlocked_verdict)
 
