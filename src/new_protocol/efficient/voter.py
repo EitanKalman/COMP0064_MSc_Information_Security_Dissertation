@@ -1,14 +1,15 @@
 import datetime
 import json
 import random
-import socket
 import secrets
-import sympy
+import socket
 
+import sympy
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 
 from src.helpers import prf
+
 
 class Voter:
     """

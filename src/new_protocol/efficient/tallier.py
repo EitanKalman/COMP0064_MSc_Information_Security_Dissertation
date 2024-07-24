@@ -1,10 +1,11 @@
 import json
+import multiprocessing
 import socket
 import threading
-import multiprocessing
 import time
 
 from Crypto.Cipher import ChaCha20
+
 
 def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int) -> int:
     """

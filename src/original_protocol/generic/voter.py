@@ -3,6 +3,7 @@ import socket
 
 from src.helpers import prf
 
+
 class Voter:
     """
     A class to represent a voter in the secure voting protocol.

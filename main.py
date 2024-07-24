@@ -1,9 +1,9 @@
 import sys
 
-from src.original_protocol.efficient.original_efficient import original_efficient
-from src.original_protocol.generic.original_generic import original_generic
-
 from src.new_protocol.efficient.new_efficient import new_efficient
+from src.original_protocol.efficient.original_efficient import \
+    original_efficient
+from src.original_protocol.generic.original_generic import original_generic
 
 if __name__ == "__main__":
 

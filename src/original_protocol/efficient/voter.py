@@ -1,7 +1,8 @@
-import socket
 import secrets
+import socket
 
 from src.helpers import prf
+
 
 class Voter:
     """

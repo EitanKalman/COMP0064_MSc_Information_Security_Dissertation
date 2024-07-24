@@ -2,6 +2,7 @@ import secrets
 import socket
 import threading
 
+
 class FinalVoter:
     """
     A class to represent the final voter in the secure voting protocol.

@@ -1,6 +1,7 @@
 """Provides various functions used in the program"""
 from hashlib import sha256
 
+
 def prf(k: bytes, val: str) -> int:
     """
     Pseudo Random Function (PRF) implementation using SHA-256.

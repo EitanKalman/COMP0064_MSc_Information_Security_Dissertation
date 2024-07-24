@@ -7,6 +7,7 @@ from src.original_protocol.generic.final_voter import FinalVoter
 from src.original_protocol.generic.tallier import Tallier
 from src.original_protocol.generic.voter import Voter
 
+
 def original_generic(number_of_voters: int, threshold: int) -> None:
     """Run the original efficient protocol"""
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF

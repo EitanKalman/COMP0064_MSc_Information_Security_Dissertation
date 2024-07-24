@@ -1,10 +1,10 @@
+import itertools
 import json
 import socket
 import threading
-import itertools
 
-from src.original_protocol.generic.bloom_filter import BloomFilter
 from src.helpers import prf
+from src.original_protocol.generic.bloom_filter import BloomFilter
 
 
 class FinalVoter:

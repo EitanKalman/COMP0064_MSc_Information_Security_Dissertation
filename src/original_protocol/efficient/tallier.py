@@ -1,6 +1,7 @@
 import socket
 import threading
 
+
 class Tallier:
     """
     A class to represent the tallier in the secure voting protocol.
