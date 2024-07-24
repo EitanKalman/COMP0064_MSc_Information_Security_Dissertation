@@ -6,30 +6,62 @@ import time
 
 from Crypto.Cipher import ChaCha20
 
-def unlock(n, a, t, CK, CM, nonce):
+def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int) -> int:
+    """
+    Decrypts and computes the unlocked vote from the time-locked vote parameters.
+
+    Parameters:
+    -----------
+    n : int
+        The modulus used in the vote encryption.
+    a : int
+        The base number used in the encryption process.
+    t : int
+        The exponent to which the base is raised in the decryption process.
+    key : int
+        The combined key derived from private keys of the authorities.
+    message_ciphertext : int
+        The combined encrypted vote message.
+    nonce : int
+        The nonce value used for symmetric decryption.
+
+    Returns:
+    --------
+    int
+        The decrypted and computed vote as an integer.
+    """
     first_time = time.perf_counter()
     nonce = int.to_bytes(nonce, length=8)
-    ciphertext = int.to_bytes(CM, length=32)
+    ciphertext = int.to_bytes(message_ciphertext, length=32)
     x = a
     for _ in range(1, t+1):
         x = (x**2) % n
     b = x
     second_time = time.perf_counter()
     print(f"time taken: {second_time-first_time}")
-    K = int.to_bytes(CK - b, length=32)
+    K = int.to_bytes(key - b, length=32)
     cipher = ChaCha20.new(key=K, nonce=nonce)
     plaintext = cipher.decrypt(ciphertext)
     return int.from_bytes(plaintext)
 
-def unlock_message(message, encoded_votes):
+def unlock_message(message: dict, encoded_votes: list) -> None:
+    """
+    Initiates the unlocking of a single encoded vote and appends it to the list of encoded votes.
+
+    Parameters:
+    -----------
+    message : dict
+        A dictionary containing the details required to unlock the time-locked vote including the parameters n, a, t, CK, CM, and nonce.
+    encoded_votes : list
+        A shared list (from multiprocessing.Manager) to which the unlocked vote is appended.
+    """
     n = message['n']
     a = message['a']
     t = message['t']
-    CK = message['CK']
-    CM = message['CM']
+    key = message['CK']
+    message_ciphertext = message['CM']
     nonce = message['nonce']
-    unlocked_vote = unlock(n, a, t, CK, CM, nonce)
-    print(f"unlocked vote: {unlocked_vote}")
+    unlocked_vote = unlock(n, a, t, key, message_ciphertext, nonce)
     encoded_votes.append(unlocked_vote)
 
 
@@ -82,7 +114,15 @@ class Tallier:
         self.unlocking_processes = []
         self.final_verdict = None
 
-    def process_message(self, message):
+    def process_message(self, message: dict) -> None:
+        """
+        Processes each incoming message based on its type and initiates unlocking of time-locked votes or directly appends non-time-locked votes.
+
+        Parameters:
+        -----------
+        message : dict
+            The message received from a voter, which could be a time-locked vote or a direct vote.
+        """
         if message['type'] == 'time_locked':
             # Create a process for the time locked vote and start it
             p = multiprocessing.Process(target=unlock_message, args=(message, self.encoded_votes,))
@@ -100,7 +140,7 @@ class Tallier:
         server_socket.listen(self.number_of_voters)
 
         while self.received_votes < self.number_of_voters:
-            client_socket, addr = server_socket.accept()
+            client_socket, _ = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
                 message = json.loads(data.decode('utf-8'))
@@ -114,7 +154,6 @@ class Tallier:
         """
         combined_votes = 0
         for encoded_vote in self.encoded_votes:
-            print(f"encoded vote: {encoded_vote}")
             combined_votes ^= encoded_vote
         self.final_verdict = 0 if combined_votes == 0 else 1
 
@@ -127,7 +166,7 @@ class Tallier:
 
         for process in self.unlocking_processes:
             process.join()
-        
+
         end = time.perf_counter()
 
         print(f"total time {end-start}")

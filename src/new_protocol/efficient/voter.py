@@ -5,12 +5,10 @@ import socket
 import secrets
 import sympy
 
-from base64 import b64encode
-
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 
-# from src.helpers import prf
+from src.helpers import prf
 
 class Voter:
     """
@@ -65,8 +63,7 @@ class Voter:
         int
             The masking value.
         """
-        return 0
-        # return prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
+        return prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
 
     def mask_vote(self, masking_value: int) -> int:
         """
@@ -87,34 +84,77 @@ class Voter:
         else:
             vote = secrets.randbelow(2**256)  # Random value in F_p
         return vote ^ masking_value
-    
 
-    def generate_prime(self, bits):
+
+    def generate_prime(self, bits: int) -> int:
+        """
+        Generates a prime number of specified bit length using the sympy library.
+
+        Parameters:
+        -----------
+        bits : int
+            The desired bit length of the prime number.
+
+        Returns:
+        --------
+        int
+            A prime number with the specified bit length.
+        """
         return sympy.randprime(2**(bits-1), 2**bits)
 
-    def generate_modulus(self, bits):
+    def generate_modulus(self, bits: int) -> tuple:
+        """
+        Generates a modulus by computing the product of two prime numbers, each half of the specified bit length, suitable for cryptographic operations.
+
+        Parameters:
+        -----------
+        bits : int
+            The total bit length for the modulus (n). The function will generate two primes each of half this bit size.
+
+        Returns:
+        --------
+        tuple: (n, phi_n)
+            n is the RSA modulus and phi_n is Euler's totient function value for n.
+        """
         p = self.generate_prime(bits // 2)
         q = self.generate_prime(bits // 2)
         n = p * q
         phi_n = (p - 1) * (q - 1)
         return n, phi_n
 
-    def time_lock(self, message, T, S):
+    def time_lock(self, message: int, time_for_lock: int, squarings: int) -> tuple:
+        """
+        Applies a time-lock puzzle to the message by encrypting it and requiring computational work to decrypt that scales with specified parameters.
+
+        Parameters:
+        -----------
+        message : int
+            The message (typically a masked vote) to be time-locked.
+        time_for_lock : int
+            The approximate amount of real-time, in seconds, that should elapse before the message can be decrypted.
+        squarings : int
+            The number of squarings used in the time-lock puzzle, defining the difficulty of the puzzle.
+
+        Returns:
+        --------
+        tuple
+            A tuple containing parameters (n, a, t, key, message_ciphertext, nonce) necessary for solving the time-lock puzzle and decrypting the message.
+        """
         n, phi_n,= self.generate_modulus(128)
-        t = T*S
+        t = time_for_lock*squarings
 
         K = get_random_bytes(32)
         cipher = ChaCha20.new(key=K)
         ciphertext = cipher.encrypt(int.to_bytes(message, length=32))
-        CM = int.from_bytes(ciphertext)
+        message_ciphertext = int.from_bytes(ciphertext)
         nonce = int.from_bytes(cipher.nonce)
 
         a = random.randint(2, n-1)
         e = pow(2, t, phi_n)
         b = pow(a, e, n)
-        CK = int.from_bytes(K) + b
+        key = int.from_bytes(K) + b
 
-        return n, a, t, CK, CM, nonce
+        return n, a, t, key, message_ciphertext, nonce
 
     def run(self)  -> None:
         """
@@ -134,7 +174,7 @@ class Voter:
 
         time = int((self.vote_time-now).total_seconds())
 
-        n, a, t, CK, CM, nonce = self.time_lock(encoded_vote, time, self.squarings)
+        n, a, t, key, message_ciphertext, nonce = self.time_lock(encoded_vote, time, self.squarings)
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
@@ -142,8 +182,8 @@ class Voter:
                    'n': n,
                    'a': a,
                    't': t,
-                   'CK': CK,
-                   'CM': CM,
+                   'CK': key,
+                   'CM': message_ciphertext,
                    'nonce': nonce
         }
         client_socket.sendall(json.dumps(message).encode('utf-8'))
