@@ -6,7 +6,7 @@ import socket
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 
-from src.efficient_voter import EfficientVoter
+from src.efficient_protocols.efficient_voter import EfficientVoter
 from src.helpers import generate_modulus
 
 

@@ -5,7 +5,7 @@ import time
 
 from Crypto.Cipher import ChaCha20
 
-from src.efficient_tallier import EfficientTallier
+from src.efficient_protocols.efficient_tallier import EfficientTallier
 
 
 def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int) -> int:

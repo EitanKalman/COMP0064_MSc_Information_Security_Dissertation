@@ -1,6 +1,6 @@
 import socket
 
-from src.efficient_voter import EfficientVoter
+from src.efficient_protocols.efficient_voter import EfficientVoter
 
 
 class OriginalEfficientVoter(EfficientVoter):

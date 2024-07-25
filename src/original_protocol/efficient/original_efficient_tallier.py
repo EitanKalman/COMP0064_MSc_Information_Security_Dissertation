@@ -1,6 +1,6 @@
 import socket
 
-from src.efficient_tallier import EfficientTallier
+from src.efficient_protocols.efficient_tallier import EfficientTallier
 
 
 class OriginalEfficientTallier(EfficientTallier):
