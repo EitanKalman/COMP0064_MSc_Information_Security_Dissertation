@@ -4,7 +4,6 @@ import random
 import secrets
 import socket
 
-import sympy
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 

@@ -114,7 +114,7 @@ class FinalVoter:
         server_socket.listen(self.number_of_voters)
 
         while len(self.masking_values) < self.number_of_voters - 1:
-            client_socket, addr = server_socket.accept()
+            client_socket, _ = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
                 self.masking_values.append(int(data.decode()))

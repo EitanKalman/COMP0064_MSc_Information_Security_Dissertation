@@ -162,7 +162,7 @@ class Tallier:
         combined_votes = 0
         for encoded_vote in self.encoded_votes:
             combined_votes ^= encoded_vote
-        
+
         #If the combined vote is in the bloom filter, set the final verdict to 1, otherwise 0
         if self.bloom_filter.check(combined_votes):
             self.final_verdict = 1

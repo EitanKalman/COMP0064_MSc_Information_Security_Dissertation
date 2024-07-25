@@ -129,7 +129,6 @@ class FinalVoter:
 
         encoded_vote = self.mask_vote(masking_value)
         bloom_filter = self.create_bloom_filter()
-        print(bloom_filter.bit_array)
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
