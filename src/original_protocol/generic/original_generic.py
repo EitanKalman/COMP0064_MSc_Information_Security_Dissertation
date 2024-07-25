@@ -3,9 +3,11 @@ import threading
 from random import randint
 from typing import List
 
-from src.original_protocol.generic.final_voter import FinalVoter
-from src.original_protocol.generic.tallier import Tallier
-from src.original_protocol.generic.voter import Voter
+from src.generic_protocols.generic_final_voter import GenericFinalVoter
+from src.original_protocol.generic.original_generic_tallier import \
+    OriginalGenericTallier
+from src.original_protocol.generic.original_generic_voter import \
+    OriginalGenericVoter
 
 
 def original_generic(number_of_voters: int, threshold: int) -> None:
@@ -17,22 +19,22 @@ def original_generic(number_of_voters: int, threshold: int) -> None:
     # Create the desired number of Voters
     # number_of_voters = 10
     # threshold = 6
-    voters: List[Voter] = []
+    voters: List[OriginalGenericVoter] = []
     votes: List[int] = []
     for i in range(number_of_voters-1):
         vote: int = randint(0,1)
         votes.append(vote)
-        voter = Voter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port)
+        voter = OriginalGenericVoter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port)
         voters.append(voter)
 
     # Create the Tallier
-    tallier = Tallier(number_of_voters, tallier_port)
+    tallier = OriginalGenericTallier(number_of_voters, tallier_port)
     tallier_thread = threading.Thread(target=tallier.run)
 
     # Create the FinalVoter
     final_voter_vote: int = randint(0,1)
     votes.append(final_voter_vote)
-    final_voter = FinalVoter(k_0, f"voter{number_of_voters-1}", number_of_voters-1, final_voter_vote, 0, threshold, number_of_voters, final_voter_port, tallier_port)
+    final_voter = GenericFinalVoter(k_0, f"voter{number_of_voters-1}", number_of_voters-1, final_voter_vote, 0, threshold, number_of_voters, final_voter_port, tallier_port)
     final_voter_thread= threading.Thread(target=final_voter.run)
 
     # Start the Tallier and FinalVoter servers in separate threads

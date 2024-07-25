@@ -8,37 +8,7 @@ from src.bloom_filter import BloomFilter
 from src.helpers import prf
 
 
-class FinalVoter:
-    """
-    A class to represent the final voter in the secure voting protocol.
-
-    Attributes:
-    -----------
-    number_of_voters : int
-        The total number of voters.
-    vote : int
-        The final voter's vote (0 or 1).
-    port : int
-        The port number for the final voter server.
-    tallier_port : int
-        The port number for connecting to the tallier.
-    masking_values : list
-        A list to store masking values received from other voters.
-    lock : threading.Lock
-        A lock to ensure thread-safe operations on masking_values.
-
-    Methods:
-    --------
-    generate_masking_value():
-        Generates the masking value by XORing all received masking values.
-    mask_vote(masking_value):
-        Masks the final voter's vote using the masking value.
-    start_server():
-        Starts the server to receive masking values from other voters.
-    run():
-        Runs the final voter
-    """
-
+class GenericFinalVoter:
     def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int, threshold: int, number_of_voters: int, port: int, tallier_port: int) -> None:
         self.key = key
         self.voter_id = voter_id
@@ -68,12 +38,12 @@ class FinalVoter:
 
     def mask_vote(self, masking_value: int) -> int:
         """
-        Masks the final voter's vote using the masking value.
+        Masks the voter's vote using the masking value.
 
         Parameters:
         -----------
         masking_value : int
-            The combined masking value.
+            The masking value.
 
         Returns:
         --------
@@ -134,9 +104,9 @@ class FinalVoter:
         client_socket.connect(('localhost', self.tallier_port))
 
         message = {'type': 'vote_bf',
-                   'vote': encoded_vote,
-                   'bf': bloom_filter.to_dict()
-                   }
-
+                    'vote': encoded_vote,
+                    'bf': bloom_filter.to_dict()
+                    }
+        
         client_socket.sendall(json.dumps(message).encode('utf-8'))
         client_socket.close()
