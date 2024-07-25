@@ -4,7 +4,7 @@ import threading
 from random import randint
 from typing import List
 
-from src.new_protocol.generic.final_voter import FinalVoter
+from src.generic_protocols.generic_final_voter import GenericFinalVoter
 from src.new_protocol.generic.new_generic_voter import NewGenericVoter
 from src.new_protocol.generic.tallier import Tallier
 
@@ -39,7 +39,7 @@ def new_generic(number_of_voters: int, threshold: int) -> None:
     # Create the FinalVoter
     final_voter_vote: int = randint(0,1)
     votes.append(final_voter_vote)
-    final_voter = FinalVoter(k_0, f"voter{number_of_voters-1}", number_of_voters-1, final_voter_vote, 0, threshold, number_of_voters, final_voter_port, tallier_port)
+    final_voter = GenericFinalVoter(k_0, f"voter{number_of_voters-1}", number_of_voters-1, final_voter_vote, 0, threshold, number_of_voters, final_voter_port, tallier_port)
     final_voter_thread= threading.Thread(target=final_voter.run)
 
 
