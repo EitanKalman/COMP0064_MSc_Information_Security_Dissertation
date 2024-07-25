@@ -26,8 +26,7 @@ def new_generic(number_of_voters: int, threshold: int) -> None:
     voters: List[Voter] = []
     votes: List[int] = []
     for i in range(number_of_voters-1):
-        # vote: int = randint(0,1)
-        vote = 0
+        vote: int = randint(0,1)
         votes.append(vote)
         voter = Voter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port, vote_time, squarings_per_second)
         voters.append(voter)
