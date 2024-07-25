@@ -1,6 +1,7 @@
 import argparse
 
 from src.new_protocol.efficient.new_efficient import new_efficient
+from src.new_protocol.generic.new_generic import new_generic
 from src.original_protocol.efficient.original_efficient import \
     original_efficient
 from src.original_protocol.generic.original_generic import original_generic
@@ -28,8 +29,8 @@ if __name__ == "__main__":
     elif args.dr and args.e:
         new_efficient(args.n)
     elif args.dr and args.g:
-        print("Not yet implemented")
-        # new_generic(args.n, args.t)
+        # print("Not yet implemented")
+        new_generic(args.n, args.t)
     else:
         print("Invalid combination of flags")
     
