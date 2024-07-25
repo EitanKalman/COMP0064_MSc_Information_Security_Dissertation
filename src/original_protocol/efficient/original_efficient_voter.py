@@ -1,10 +1,9 @@
-import secrets
 import socket
 
-from src.helpers import prf
+from src.efficient_protocols.efficient_voter import EfficientVoter
 
 
-class Voter:
+class OriginalEfficientVoter(EfficientVoter):
     """
     A class to represent a voter in the secure voting protocol.
 
@@ -36,46 +35,6 @@ class Voter:
     run():
         Runs the voter's operations including sending the masking value and encoded vote.
     """
-
-    def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int, final_voter_port: int, tallier_port: int) -> None:
-        self.key = key
-        self.voter_id = voter_id
-        self.voter_index = voter_index
-        self.vote = vote
-        self.offset = offset
-        self.final_voter_port = final_voter_port
-        self.tallier_port = tallier_port
-
-    def generate_masking_value(self) -> int:
-        """
-        Generates the masking value for the voter.
-
-        Returns:
-        --------
-        int
-            The masking value.
-        """
-        return prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
-
-    def mask_vote(self, masking_value: int) -> int:
-        """
-        Masks the voter's vote using the masking value.
-
-        Parameters:
-        -----------
-        masking_value : int
-            The masking value.
-
-        Returns:
-        --------
-        int
-            The masked vote.
-        """
-        if self.vote == 0:
-            vote = 0
-        else:
-            vote = secrets.randbelow(2**256)  # Random value in F_p
-        return vote ^ masking_value
 
     def run(self)  -> None:
         """

@@ -1,10 +1,11 @@
 import itertools
 import json
+import math
 import socket
 import threading
 
+from src.bloom_filter import BloomFilter
 from src.helpers import prf
-from src.new_protocol.generic.bloom_filter import BloomFilter
 
 
 class FinalVoter:
@@ -86,7 +87,10 @@ class FinalVoter:
         return vote ^ masking_value
 
     def create_bloom_filter(self):
-        bloom_filter = BloomFilter(self.number_of_voters)
+        elements = 0
+        for i in range(self.threshold, self.number_of_voters+1):
+            elements += math.comb(self.number_of_voters, i)
+        bloom_filter = BloomFilter(elements)
         vote_representations=[]
 
         for i in range(0, self.number_of_voters):

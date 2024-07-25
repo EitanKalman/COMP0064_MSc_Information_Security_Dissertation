@@ -4,13 +4,15 @@ import threading
 from random import randint
 from typing import List
 
-from src.new_protocol.efficient.final_voter import FinalVoter
-from src.new_protocol.efficient.tallier import Tallier
-from src.new_protocol.efficient.voter import Voter
+from src.new_protocol.efficient.new_efficient_final_voter import \
+    NewEfficientFinalVoter
+from src.new_protocol.efficient.new_efficient_tallier import \
+    NewEfficientTallier
+from src.new_protocol.efficient.new_efficient_voter import NewEfficientVoter
 
 
 def new_efficient(number_of_voters: int) -> None:
-    """Run the original efficient protocol"""
+    """Run the new efficient protocol"""
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF
     final_voter_port: int = 65433
     tallier_port: int = 65432
@@ -23,23 +25,23 @@ def new_efficient(number_of_voters: int) -> None:
 
     # Create the desired number of Voters
     # number_of_voters = 10
-    voters: List[Voter] = []
+    voters: List[NewEfficientVoter] = []
     votes: List[int] = []
     for i in range(number_of_voters-1):
         vote: int = randint(0,1)
         votes.append(vote)
-        voter = Voter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port, vote_time, squarings_per_second)
+        voter = NewEfficientVoter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port, vote_time, squarings_per_second)
         voters.append(voter)
 
 
     # Create the Tallier
-    tallier = Tallier(number_of_voters, tallier_port)
+    tallier = NewEfficientTallier(number_of_voters, tallier_port)
     tallier_thread = threading.Thread(target=tallier.run)
 
     # Create the FinalVoter
     final_voter_vote: int = randint(0,1)
     votes.append(final_voter_vote)
-    final_voter = FinalVoter(number_of_voters, final_voter_vote, final_voter_port, tallier_port)
+    final_voter = NewEfficientFinalVoter(number_of_voters, final_voter_vote, final_voter_port, tallier_port)
     final_voter_thread= threading.Thread(target=final_voter.run)
 
 

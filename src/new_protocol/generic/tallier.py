@@ -6,7 +6,7 @@ import time
 
 from Crypto.Cipher import ChaCha20
 
-from src.new_protocol.generic.bloom_filter import BloomFilter
+from src.bloom_filter import BloomFilter
 
 
 def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int) -> int:
@@ -162,7 +162,7 @@ class Tallier:
         combined_votes = 0
         for encoded_vote in self.encoded_votes:
             combined_votes ^= encoded_vote
-        
+
         #If the combined vote is in the bloom filter, set the final verdict to 1, otherwise 0
         if self.bloom_filter.check(combined_votes):
             self.final_verdict = 1

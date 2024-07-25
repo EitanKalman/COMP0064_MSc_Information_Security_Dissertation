@@ -29,7 +29,6 @@ if __name__ == "__main__":
     elif args.dr and args.e:
         new_efficient(args.n)
     elif args.dr and args.g:
-        # print("Not yet implemented")
         new_generic(args.n, args.t)
     else:
         print("Invalid combination of flags")

@@ -8,7 +8,7 @@ import sympy
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 
-from src.helpers import prf
+from src.helpers import generate_modulus, prf
 
 
 class Voter:
@@ -86,43 +86,6 @@ class Voter:
             vote = prf(self.key, f"2{self.offset}{self.voter_index}{self.voter_id}")
         return vote ^ masking_value
 
-
-    def generate_prime(self, bits: int) -> int:
-        """
-        Generates a prime number of specified bit length using the sympy library.
-
-        Parameters:
-        -----------
-        bits : int
-            The desired bit length of the prime number.
-
-        Returns:
-        --------
-        int
-            A prime number with the specified bit length.
-        """
-        return sympy.randprime(2**(bits-1), 2**bits)
-
-    def generate_modulus(self, bits: int) -> tuple:
-        """
-        Generates a modulus by computing the product of two prime numbers, each half of the specified bit length, suitable for cryptographic operations.
-
-        Parameters:
-        -----------
-        bits : int
-            The total bit length for the modulus (n). The function will generate two primes each of half this bit size.
-
-        Returns:
-        --------
-        tuple: (n, phi_n)
-            n is the RSA modulus and phi_n is Euler's totient function value for n.
-        """
-        p = self.generate_prime(bits // 2)
-        q = self.generate_prime(bits // 2)
-        n = p * q
-        phi_n = (p - 1) * (q - 1)
-        return n, phi_n
-
     def time_lock(self, message: int, time_for_lock: int, squarings: int) -> tuple:
         """
         Applies a time-lock puzzle to the message by encrypting it and requiring computational work to decrypt that scales with specified parameters.
@@ -141,7 +104,7 @@ class Voter:
         tuple
             A tuple containing parameters (n, a, t, key, message_ciphertext, nonce) necessary for solving the time-lock puzzle and decrypting the message.
         """
-        n, phi_n,= self.generate_modulus(128)
+        n, phi_n,= generate_modulus(128)
         t = time_for_lock*squarings
 
         K = get_random_bytes(32)
