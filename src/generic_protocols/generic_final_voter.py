@@ -2,39 +2,20 @@ import itertools
 import json
 import math
 import socket
-import threading
 
 from src.bloom_filter import BloomFilter
+from src.final_voter import FinalVoter
 from src.helpers import prf
 
 
-class GenericFinalVoter:
+class GenericFinalVoter(FinalVoter):
     def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int, threshold: int, number_of_voters: int, port: int, tallier_port: int) -> None:
+        super().__init__(number_of_voters, vote, port, tallier_port)
         self.key = key
         self.voter_id = voter_id
         self.voter_index = voter_index
-        self.vote = vote
         self.offset = offset
         self.threshold = threshold
-        self.number_of_voters = number_of_voters
-        self.port = port
-        self.tallier_port = tallier_port
-        self.masking_values = []
-        self.lock = threading.Lock()
-
-    def generate_masking_value(self) -> int:
-        """
-        Generates the masking value by XORing all received masking values.
-
-        Returns:
-        --------
-        int
-            The combined masking value.
-        """
-        masking_value = 0
-        for value in self.masking_values:
-            masking_value ^= value
-        return masking_value
 
     def mask_vote(self, masking_value: int) -> int:
         """
@@ -107,6 +88,6 @@ class GenericFinalVoter:
                     'vote': encoded_vote,
                     'bf': bloom_filter.to_dict()
                     }
-        
+
         client_socket.sendall(json.dumps(message).encode('utf-8'))
-        client_socket.close()
+        client_socket.close() 
