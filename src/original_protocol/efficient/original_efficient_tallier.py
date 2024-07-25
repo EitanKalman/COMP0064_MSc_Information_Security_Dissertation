@@ -30,21 +30,7 @@ class OriginalEfficientTallier(EfficientTallier):
         Runs the tallier's operations including starting the server and computing the final verdict.
     get_final_verdict():
         Returns the final verdict after all votes have been processed.
-    """
-
-    def __init__(self, number_of_voters: int, port: int) -> None:
-        """
-        Constructs all the necessary attributes for the Tallier object.
-
-        Parameters:
-        -----------
-        number_of_voters : int
-            The total number of voters.
-        port : int
-            The port number for the tallier server.
-        """
-        super().__init__(number_of_voters, port)
-        
+    """    
 
     def start_server(self) -> None:
         """
