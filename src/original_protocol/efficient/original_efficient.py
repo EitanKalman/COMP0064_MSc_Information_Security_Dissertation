@@ -4,8 +4,9 @@ from random import randint
 from typing import List
 
 from src.original_protocol.efficient.final_voter import FinalVoter
+from src.original_protocol.efficient.original_efficient_voter import \
+    OriginalEfficientVoter
 from src.original_protocol.efficient.tallier import Tallier
-from src.original_protocol.efficient.voter import Voter
 
 
 def original_efficient(number_of_voters: int) -> None:
@@ -16,12 +17,12 @@ def original_efficient(number_of_voters: int) -> None:
 
     # Create the desired number of Voters
     # number_of_voters = 10
-    voters: List[Voter] = []
+    voters: List[OriginalEfficientVoter] = []
     votes: List[int] = []
     for i in range(number_of_voters-1):
         vote: int = randint(0,1)
         votes.append(vote)
-        voter = Voter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port)
+        voter = OriginalEfficientVoter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port)
         voters.append(voter)
 
     # Create the Tallier

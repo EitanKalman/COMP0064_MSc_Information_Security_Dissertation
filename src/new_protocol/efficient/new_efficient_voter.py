@@ -1,16 +1,16 @@
 import datetime
 import json
 import random
-import secrets
 import socket
 
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 
-from src.helpers import generate_modulus, prf
+from src.efficient_voter import EfficientVoter
+from src.helpers import generate_modulus
 
 
-class Voter:
+class NewEfficientVoter(EfficientVoter):
     """
     A class to represent a voter in the secure voting protocol.
 
@@ -44,46 +44,9 @@ class Voter:
     """
 
     def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int, final_voter_port: int, tallier_port: int, vote_time: int, squarings: int) -> None:
-        self.key = key
-        self.voter_id = voter_id
-        self.voter_index = voter_index
-        self.vote = vote
-        self.offset = offset
-        self.final_voter_port = final_voter_port
-        self.tallier_port = tallier_port
+        super().__init__(key, voter_id, voter_index, vote, offset, final_voter_port, tallier_port)
         self.vote_time = vote_time
         self.squarings = squarings
-
-    def generate_masking_value(self) -> int:
-        """
-        Generates the masking value for the voter.
-
-        Returns:
-        --------
-        int
-            The masking value.
-        """
-        return prf(self.key, f'{self.offset}{self.voter_index}{self.voter_id}')
-
-    def mask_vote(self, masking_value: int) -> int:
-        """
-        Masks the voter's vote using the masking value.
-
-        Parameters:
-        -----------
-        masking_value : int
-            The masking value.
-
-        Returns:
-        --------
-        int
-            The masked vote.
-        """
-        if self.vote == 0:
-            vote = 0
-        else:
-            vote = secrets.randbelow(2**256)  # Random value in F_p
-        return vote ^ masking_value
 
     def time_lock(self, message: int, time_for_lock: int, squarings: int) -> tuple:
         """
