@@ -24,20 +24,20 @@ def prf(k: bytes, val: str) -> int:
 
 
 def _generate_prime(bits: int) -> int:
-        """
-        Generates a prime number of specified bit length using the sympy library.
+    """
+    Generates a prime number of specified bit length using the sympy library.
 
-        Parameters:
-        -----------
-        bits : int
-            The desired bit length of the prime number.
+    Parameters:
+    -----------
+    bits : int
+        The desired bit length of the prime number.
 
-        Returns:
-        --------
-        int
-            A prime number with the specified bit length.
-        """
-        return sympy.randprime(2**(bits-1), 2**bits)
+    Returns:
+    --------
+    int
+        A prime number with the specified bit length.
+    """
+    return sympy.randprime(2**(bits-1), 2**bits)
 
 def generate_modulus(bits: int) -> tuple:
     """

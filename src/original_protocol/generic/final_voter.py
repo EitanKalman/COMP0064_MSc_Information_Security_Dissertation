@@ -130,8 +130,8 @@ class FinalVoter:
         client_socket.connect(('localhost', self.tallier_port))
 
         message = {'type': 'vote_bf',
-                        'vote': encoded_vote,
-                        'bf': bloom_filter.to_dict()
-                        }
+                    'vote': encoded_vote,
+                    'bf': bloom_filter.to_dict()
+                    }
         client_socket.sendall(json.dumps(message).encode('utf-8'))
         client_socket.close()
