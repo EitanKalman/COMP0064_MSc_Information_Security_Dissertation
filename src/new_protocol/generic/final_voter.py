@@ -1,5 +1,6 @@
 import itertools
 import json
+import math
 import socket
 import threading
 
@@ -86,7 +87,10 @@ class FinalVoter:
         return vote ^ masking_value
 
     def create_bloom_filter(self):
-        bloom_filter = BloomFilter(self.number_of_voters)
+        elements = 0
+        for i in range(self.threshold, self.number_of_voters+1):
+            elements += math.comb(self.number_of_voters, i)
+        bloom_filter = BloomFilter(elements)
         vote_representations=[]
 
         for i in range(0, self.number_of_voters):
@@ -125,6 +129,7 @@ class FinalVoter:
 
         encoded_vote = self.mask_vote(masking_value)
         bloom_filter = self.create_bloom_filter()
+        print(bloom_filter.bit_array)
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
