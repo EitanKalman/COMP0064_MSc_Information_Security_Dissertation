@@ -1,7 +1,7 @@
-import threading
+from src.tallier import Tallier
 
 
-class GenericTallier:
+class GenericTallier(Tallier):
     def __init__(self, number_of_voters: int, port: int) -> None:
         """
         Constructs all the necessary attributes for the Tallier object.
@@ -13,12 +13,8 @@ class GenericTallier:
         port : int
             The port number for the tallier server.
         """
-        self.number_of_voters = number_of_voters
-        self.port = port
-        self.encoded_votes = []
-        self.lock = threading.Lock()
+        super().__init__(number_of_voters, port)
         self.bloom_filter = None
-        self.final_verdict = None
 
     def gfvd(self) -> int:
         """
@@ -38,14 +34,3 @@ class GenericTallier:
             self.final_verdict = 1
         else:
             self.final_verdict = 0
-
-    def get_final_verdict(self) -> int:
-        """
-        Returns the final verdict after all votes have been processed.
-
-        Returns:
-        --------
-        int or None
-            The final verdict if it has been computed, otherwise None.
-        """
-        return self.final_verdict
