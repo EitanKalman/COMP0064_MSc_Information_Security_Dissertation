@@ -1,12 +1,12 @@
 import json
 import multiprocessing
 import socket
-import threading
 import time
 
 from Crypto.Cipher import ChaCha20
 
 from src.bloom_filter import BloomFilter
+from src.generic_protocols.generic_tallier import GenericTallier
 
 
 def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int) -> int:
@@ -68,7 +68,7 @@ def unlock_message(message: dict, encoded_votes: list) -> None:
     encoded_votes.append(unlocked_vote)
 
 
-class Tallier:
+class NewGenericTallier(GenericTallier):
     """
     A class to represent the tallier in the secure voting protocol.
 
@@ -108,15 +108,11 @@ class Tallier:
         port : int
             The port number for the tallier server.
         """
-        self.number_of_voters = number_of_voters
-        self.port = port
+        super().__init__(number_of_voters, port)
         self.received_votes = 0
         manager = multiprocessing.Manager()
         self.encoded_votes = manager.list()
-        self.lock = threading.Lock()
         self.unlocking_processes = []
-        self.bloom_filter = None
-        self.final_verdict = None
 
     def process_message(self, message: dict) -> None:
         """
@@ -155,20 +151,6 @@ class Tallier:
                 self.received_votes += 1
             client_socket.close()
 
-    def gfvd(self) -> None:
-        """
-        Combines all encoded votes and determines the final verdict.
-        """
-        combined_votes = 0
-        for encoded_vote in self.encoded_votes:
-            combined_votes ^= encoded_vote
-
-        #If the combined vote is in the bloom filter, set the final verdict to 1, otherwise 0
-        if self.bloom_filter.check(combined_votes):
-            self.final_verdict = 1
-        else:
-            self.final_verdict = 0
-
     def run(self) -> None:
         """
         Runs the tallier's operations including starting the server and computing the final vote.
@@ -184,14 +166,3 @@ class Tallier:
         print(f"total time {end-start}")
 
         self.gfvd()
-
-    def get_final_verdict(self) -> int:
-        """
-        Returns the final verdict after all votes have been processed.
-
-        Returns:
-        --------
-        int or None
-            The final verdict if it has been computed, otherwise None.
-        """
-        return self.final_verdict

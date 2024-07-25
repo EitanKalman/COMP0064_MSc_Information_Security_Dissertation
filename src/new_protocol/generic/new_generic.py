@@ -5,8 +5,8 @@ from random import randint
 from typing import List
 
 from src.generic_protocols.generic_final_voter import GenericFinalVoter
+from src.new_protocol.generic.new_generic_tallier import NewGenericTallier
 from src.new_protocol.generic.new_generic_voter import NewGenericVoter
-from src.new_protocol.generic.tallier import Tallier
 
 
 def new_generic(number_of_voters: int, threshold: int) -> None:
@@ -33,7 +33,7 @@ def new_generic(number_of_voters: int, threshold: int) -> None:
 
 
     # Create the Tallier
-    tallier = Tallier(number_of_voters, tallier_port)
+    tallier = NewGenericTallier(number_of_voters, tallier_port)
     tallier_thread = threading.Thread(target=tallier.run)
 
     # Create the FinalVoter
