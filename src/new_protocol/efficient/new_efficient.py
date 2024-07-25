@@ -5,8 +5,9 @@ from random import randint
 from typing import List
 
 from src.new_protocol.efficient.final_voter import FinalVoter
+from src.new_protocol.efficient.new_efficient_tallier import \
+    NewEfficientTallier
 from src.new_protocol.efficient.new_efficient_voter import NewEfficientVoter
-from src.new_protocol.efficient.tallier import Tallier
 
 
 def new_efficient(number_of_voters: int) -> None:
@@ -33,7 +34,7 @@ def new_efficient(number_of_voters: int) -> None:
 
 
     # Create the Tallier
-    tallier = Tallier(number_of_voters, tallier_port)
+    tallier = NewEfficientTallier(number_of_voters, tallier_port)
     tallier_thread = threading.Thread(target=tallier.run)
 
     # Create the FinalVoter
