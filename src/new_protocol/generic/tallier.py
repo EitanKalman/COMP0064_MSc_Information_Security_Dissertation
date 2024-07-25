@@ -6,7 +6,7 @@ import time
 
 from Crypto.Cipher import ChaCha20
 
-from src.new_protocol.generic.bloom_filter import BloomFilter
+from src.bloom_filter import BloomFilter
 
 
 def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int) -> int:

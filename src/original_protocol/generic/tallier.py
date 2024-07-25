@@ -2,7 +2,7 @@ import json
 import socket
 import threading
 
-from src.original_protocol.generic.bloom_filter import BloomFilter
+from src.bloom_filter import BloomFilter
 
 
 class Tallier:

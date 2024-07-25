@@ -3,8 +3,8 @@ import json
 import socket
 import threading
 
+from src.bloom_filter import BloomFilter
 from src.helpers import prf
-from src.new_protocol.generic.bloom_filter import BloomFilter
 
 
 class FinalVoter:
