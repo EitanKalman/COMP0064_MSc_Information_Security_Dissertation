@@ -6,20 +6,6 @@ from src.final_voter import FinalVoter
 
 class EfficientFinalVoter(FinalVoter):
 
-    def generate_masking_value(self) -> int:
-        """
-        Generates the masking value by XORing all received masking values.
-
-        Returns:
-        --------
-        int
-            The combined masking value.
-        """
-        masking_value = 0
-        for value in self.masking_values:
-            masking_value ^= value
-        return masking_value
-
     def mask_vote(self, masking_value: int) -> int:
         """
         Masks the final voter's vote using the masking value.
