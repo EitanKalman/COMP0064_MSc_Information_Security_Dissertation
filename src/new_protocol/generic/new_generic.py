@@ -5,8 +5,8 @@ from random import randint
 from typing import List
 
 from src.new_protocol.generic.final_voter import FinalVoter
+from src.new_protocol.generic.new_generic_voter import NewGenericVoter
 from src.new_protocol.generic.tallier import Tallier
-from src.new_protocol.generic.voter import Voter
 
 
 def new_generic(number_of_voters: int, threshold: int) -> None:
@@ -23,12 +23,12 @@ def new_generic(number_of_voters: int, threshold: int) -> None:
 
     # Create the desired number of Voters
     # number_of_voters = 10
-    voters: List[Voter] = []
+    voters: List[NewGenericVoter] = []
     votes: List[int] = []
     for i in range(number_of_voters-1):
         vote: int = randint(0,1)
         votes.append(vote)
-        voter = Voter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port, vote_time, squarings_per_second)
+        voter = NewGenericVoter(k_0, f"voter{i}", i, vote, 0, final_voter_port, tallier_port, vote_time, squarings_per_second)
         voters.append(voter)
 
 
