@@ -10,26 +10,30 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     group1 = parser.add_mutually_exclusive_group(required=True)
-    group1.add_argument("-o", action="store_true")
-    group1.add_argument("-dr", action="store_true")
+    group1.add_argument("-o", action="store_true", help="Run original protocol")
+    group1.add_argument("-dr", action="store_true", help="Run dropout resilient protocol")
 
     group2 = parser.add_mutually_exclusive_group(required=True)
-    group2.add_argument("-e", action="store_true")
-    group2.add_argument("-g", action="store_true")
+    group2.add_argument("-e", action="store_true", help="Run the efficient variant with a threshold of 1")
+    group2.add_argument("-g", action="store_true", help="Run the generic variant with a variable threshold")
 
-    parser.add_argument('-n', type=int, required=True)
-    parser.add_argument('-t', type=int, required=False)
+    parser.add_argument('-n', type=int, required=True, help="Set the number of voters (default is 10)")
+    parser.add_argument('-t', type=int, required=False, help="Set the threshold- only for generic variants (default is simple majority)")
 
     args = parser.parse_args()
+
+    threshold = args.t
+    if not threshold:
+        threshold = (args.n // 2) + 1
 
     if args.o and args.e:
         original_efficient(args.n)
     elif args.o and args.g:
-        original_generic(args.n, args.t)
+        original_generic(args.n, threshold)
     elif args.dr and args.e:
         new_efficient(args.n)
     elif args.dr and args.g:
-        new_generic(args.n, args.t)
+        new_generic(args.n, threshold)
     else:
         print("Invalid combination of flags")
     
