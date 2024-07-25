@@ -3,7 +3,8 @@ import threading
 from random import randint
 from typing import List
 
-from src.original_protocol.efficient.final_voter import FinalVoter
+from src.original_protocol.efficient.original_efficient_final_voter import \
+    OriginalEfficientFinalVoter
 from src.original_protocol.efficient.original_efficient_tallier import \
     OriginalEfficientTallier
 from src.original_protocol.efficient.original_efficient_voter import \
@@ -33,7 +34,7 @@ def original_efficient(number_of_voters: int) -> None:
     # Create the FinalVoter
     final_voter_vote: int = randint(0,1)
     votes.append(final_voter_vote)
-    final_voter = FinalVoter(number_of_voters, final_voter_vote, final_voter_port, tallier_port)
+    final_voter = OriginalEfficientFinalVoter(number_of_voters, final_voter_vote, final_voter_port, tallier_port)
     final_voter_thread= threading.Thread(target=final_voter.run)
 
     # Start the Tallier and FinalVoter servers in separate threads

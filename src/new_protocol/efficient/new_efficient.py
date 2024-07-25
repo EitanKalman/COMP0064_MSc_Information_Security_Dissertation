@@ -4,7 +4,8 @@ import threading
 from random import randint
 from typing import List
 
-from src.new_protocol.efficient.final_voter import FinalVoter
+from src.new_protocol.efficient.new_efficient_final_voter import \
+    NewEfficientFinalVoter
 from src.new_protocol.efficient.new_efficient_tallier import \
     NewEfficientTallier
 from src.new_protocol.efficient.new_efficient_voter import NewEfficientVoter
@@ -40,7 +41,7 @@ def new_efficient(number_of_voters: int) -> None:
     # Create the FinalVoter
     final_voter_vote: int = randint(0,1)
     votes.append(final_voter_vote)
-    final_voter = FinalVoter(number_of_voters, final_voter_vote, final_voter_port, tallier_port)
+    final_voter = NewEfficientFinalVoter(number_of_voters, final_voter_vote, final_voter_port, tallier_port)
     final_voter_thread= threading.Thread(target=final_voter.run)
 
 
