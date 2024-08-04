@@ -109,7 +109,6 @@ class NewGenericTallier(GenericTallier):
             The port number for the tallier server.
         """
         super().__init__(number_of_voters, port)
-        self.received_votes = 0
         manager = multiprocessing.Manager()
         self.encoded_votes = manager.list()
         self.unlocking_processes = []
@@ -141,14 +140,16 @@ class NewGenericTallier(GenericTallier):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('localhost', self.port))
         server_socket.listen(self.number_of_voters)
+        
+        received_votes = 0
 
-        while self.received_votes < self.number_of_voters:
+        while received_votes < self.number_of_voters:
             client_socket, _ = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
                 message = json.loads(data.decode('utf-8'))
                 self.process_message(message)
-                self.received_votes += 1
+                received_votes += 1
             client_socket.close()
 
     def run(self) -> None:

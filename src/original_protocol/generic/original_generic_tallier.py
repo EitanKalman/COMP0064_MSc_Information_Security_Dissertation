@@ -49,15 +49,12 @@ class OriginalGenericTallier(GenericTallier):
         server_socket.bind(('localhost', self.port))
         server_socket.listen(self.number_of_voters)
 
-        received_msg = 0
-
-        while received_msg < self.number_of_voters:
+        while len(self.encoded_votes) < self.number_of_voters:
             client_socket, _ = server_socket.accept()
             data = client_socket.recv(1024)
             with self.lock:
                 message = json.loads(data.decode('utf-8'))
                 self.process_message(message)
-                received_msg +=1
             client_socket.close()
 
 
