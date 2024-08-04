@@ -22,9 +22,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    threshold = args.t
-    if not threshold:
-        threshold = (args.n // 2) + 1
+    threshold: int = args.t if args.t else (args.n // 2) + 1
 
     if args.o and args.e:
         original_efficient(args.n)
@@ -36,4 +34,3 @@ if __name__ == "__main__":
         new_generic(args.n, threshold)
     else:
         print("Invalid combination of flags")
-    
