@@ -7,6 +7,7 @@ receive masking values, and run the final voter operations.
 
 import json
 import socket
+import time
 from src.efficient_protocols.efficient_final_voter import EfficientFinalVoter
 
 
@@ -33,10 +34,20 @@ class NewEfficientFinalVoter(EfficientFinalVoter):
         Runs the final voter operations including receiving masking values and sending the
         encoded vote.
         """
-        self.start_server()
-        masking_value: int = self.generate_masking_value()
+        print("FinalVoter started")
+        start: float = time.perf_counter()
 
+        self.start_server()
+        time1: int = time.perf_counter()
+        masking_value: int = self.generate_masking_value()
+        time2: int = time.perf_counter()
+        print(f"Time taken for FinalVoter to generate masking value: {time2-time1}")
+
+        time1: int = time.perf_counter()
         encoded_vote: int = self.mask_vote(masking_value)
+        time2: int = time.perf_counter()
+        print(f"Time taken for FinalVoter to mask vote: {time2-time1}")
+
         client_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
 
@@ -44,3 +55,7 @@ class NewEfficientFinalVoter(EfficientFinalVoter):
 
         client_socket.sendall(json.dumps(message).encode('utf-8'))
         client_socket.close()
+
+        end: float = time.perf_counter()
+
+        print(f"FinalVoter total time: {end - start}")
