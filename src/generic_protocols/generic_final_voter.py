@@ -1,56 +1,92 @@
+"""
+GenericFinalVoter class for the generic variant of the e-voting protocol.
+
+This class inherits from the FinalVoter base class and implements specific
+functionality for masking the voter's vote, creating a bloom filter, and
+running the final voter operations.
+"""
+
 import itertools
 import json
 import math
 import socket
-
+from typing import List
 from src.bloom_filter import BloomFilter
 from src.final_voter import FinalVoter
 from src.helpers import prf
 
 
 class GenericFinalVoter(FinalVoter):
-    def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int, threshold: int, number_of_voters: int, port: int, tallier_port: int) -> None:
+    """
+    GenericFinalVoter class for masking votes and handling bloom filter operations.
+
+    Attributes:
+        key (bytes): The key for the pseudo-random function.
+        voter_id (str): A unique identifier for the voter.
+        voter_index (int): The index of the voter.
+        offset (int): An offset value used in generating the masking value.
+        threshold (int): The threshold for creating combinations in the bloom filter.
+
+    Methods:
+        mask_vote(masking_value: int) -> int:
+            Masks the voter's vote using the masking value.
+
+        create_bloom_filter() -> BloomFilter:
+            Creates a bloom filter with all valid vote combinations.
+
+        start_server() -> None:
+            Starts the server to receive masking values from other voters.
+
+        run() -> None:
+            Runs the final voter operations, including sending the vote and bloom filter to the
+            tallier.
+    """
+
+    def __init__(self, key: bytes, voter_id: str, voter_index: int, vote: int, offset: int,
+                 threshold: int, number_of_voters: int, port: int, tallier_port: int) -> None:
         super().__init__(number_of_voters, vote, port, tallier_port)
-        self.key = key
-        self.voter_id = voter_id
-        self.voter_index = voter_index
-        self.offset = offset
-        self.threshold = threshold
+        self.key: bytes = key
+        self.voter_id: str = voter_id
+        self.voter_index: int = voter_index
+        self.offset: int = offset
+        self.threshold: int = threshold
 
     def mask_vote(self, masking_value: int) -> int:
         """
         Masks the voter's vote using the masking value.
 
-        Parameters:
-        -----------
-        masking_value : int
-            The masking value.
+        Args:
+            masking_value (int): The masking value.
 
         Returns:
-        --------
-        int
-            The masked vote.
+            int: The masked vote.
         """
         if self.vote == 0:
-            vote = 0
+            vote: int = 0
         else:
-            vote = prf(self.key, f"2{self.offset}{self.voter_index}{self.voter_id}")
+            vote: int = prf(self.key, f"2{self.offset}{self.voter_index}{self.voter_id}")
         return vote ^ masking_value
 
-    def create_bloom_filter(self):
-        elements = 0
-        for i in range(self.threshold, self.number_of_voters+1):
+    def create_bloom_filter(self) -> BloomFilter:
+        """
+        Create a bloom filter with all valid vote combinations based on the threshold.
+
+        Returns:
+            BloomFilter: The created bloom filter.
+        """
+        elements: int = 0
+        for i in range(self.threshold, self.number_of_voters + 1):
             elements += math.comb(self.number_of_voters, i)
         bloom_filter = BloomFilter(elements)
-        vote_representations=[]
+        vote_representations: List[int] = []
 
         for i in range(0, self.number_of_voters):
-            vote_rep = prf(self.key, f"2{self.offset}{i}voter{i}")
+            vote_rep: int = prf(self.key, f"2{self.offset}{i}voter{i}")
             vote_representations.append(vote_rep)
 
-        for i in range(self.threshold, self.number_of_voters+1):
+        for i in range(self.threshold, self.number_of_voters + 1):
             for comb in itertools.combinations(vote_representations, i):
-                xor = 0
+                xor: int = 0
                 for rep in comb:
                     xor ^= rep
                 bloom_filter.add(xor)
@@ -60,34 +96,35 @@ class GenericFinalVoter(FinalVoter):
         """
         Starts the server to receive masking values from other voters.
         """
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('localhost', self.port))
         server_socket.listen(self.number_of_voters)
 
         while len(self.masking_values) < self.number_of_voters - 1:
             client_socket, _ = server_socket.accept()
-            data = client_socket.recv(1024)
+            data: bytes = client_socket.recv(1024)
             with self.lock:
                 self.masking_values.append(int(data.decode()))
             client_socket.close()
 
     def run(self) -> None:
         """
-        Runs the final voter.
+        Runs the final voter operations, including sending the vote and bloom filter to the tallier.
         """
         self.start_server()
-        masking_value = self.generate_masking_value()
+        masking_value: int = self.generate_masking_value()
 
-        encoded_vote = self.mask_vote(masking_value)
-        bloom_filter = self.create_bloom_filter()
+        encoded_vote: int = self.mask_vote(masking_value)
+        bloom_filter: BloomFilter = self.create_bloom_filter()
 
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
 
-        message = {'type': 'vote_bf',
-                    'vote': encoded_vote,
-                    'bf': bloom_filter.to_dict()
-                    }
+        message = {
+            'type': 'vote_bf',
+            'vote': encoded_vote,
+            'bf': bloom_filter.to_dict()
+        }
 
         client_socket.sendall(json.dumps(message).encode('utf-8'))
-        client_socket.close() 
+        client_socket.close()
