@@ -90,7 +90,6 @@ class NewGenericVoter(GenericVoter):
         client_socket.close()
 
         encoded_vote: int = self.mask_vote(masking_value)
-        print(f"Sending masked vote: {encoded_vote}")
 
         now: datetime.datetime = datetime.datetime.now()
         time_to_vote: int = int((self.vote_time - now).total_seconds())

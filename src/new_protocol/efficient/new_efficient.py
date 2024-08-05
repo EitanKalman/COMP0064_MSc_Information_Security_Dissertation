@@ -74,6 +74,6 @@ def new_efficient(number_of_voters: int) -> None:
     print(f"Final verdict: {final_verdict}")
 
     # Calculate the correct final verdict to verify that the Tallier is correct
-    combined_votes: int = 1 if 1 in votes else 0
-    print(f"Combined votes: {combined_votes}")
+    combined_votes: bool = True if 1 in votes else False
+    print(f"Above Threshold?: {combined_votes}")
     print(f"Votes: {votes}")
