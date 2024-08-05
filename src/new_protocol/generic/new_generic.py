@@ -23,6 +23,8 @@ def new_generic(number_of_voters: int, threshold: int) -> None:
         number_of_voters (int): The total number of voters.
         threshold (int): The threshold for computing the final verdict.
     """
+    print(f"Running Dropout Resilient Generic Protocol with {number_of_voters} voters, with a threshold of {threshold}")
+
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF
     final_voter_port: int = 65433
     tallier_port: int = 65432

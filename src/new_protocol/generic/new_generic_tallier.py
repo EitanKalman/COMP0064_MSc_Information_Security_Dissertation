@@ -37,7 +37,7 @@ def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int
         x = (x ** 2) % n
     b: int = x
     second_time: float = time.perf_counter()
-    print(f"time taken: {second_time - first_time}")
+    print(f"Time taken to unlock vote: {second_time - first_time}")
     K: bytes = int.to_bytes(key - b, length=32, byteorder='big')
     cipher: ChaCha20.ChaCha20Cipher = ChaCha20.new(key=K, nonce=nonce_bytes)
     plaintext: bytes = cipher.decrypt(ciphertext)
@@ -145,6 +145,8 @@ class NewGenericTallier(GenericTallier):
         """
         Runs the tallier's operations including starting the server and computing the final vote.
         """
+        print("Tallier started")
+
         start: float = time.perf_counter()
         self.start_server()
 
@@ -153,6 +155,6 @@ class NewGenericTallier(GenericTallier):
 
         end: float = time.perf_counter()
 
-        print(f"total time {end - start}")
+        print(f"Tallier total time: {end - start}")
 
         self.gfvd()
