@@ -134,7 +134,7 @@ class NewGenericTallier(GenericTallier):
 
         while received_votes < self.number_of_voters:
             client_socket, _ = server_socket.accept()
-            data: bytes = client_socket.recv(1024)
+            data: bytes = client_socket.recv(131072)
             with self.lock:
                 message: dict = json.loads(data.decode('utf-8'))
                 self.process_message(message)
