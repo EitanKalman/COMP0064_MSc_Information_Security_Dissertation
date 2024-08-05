@@ -149,8 +149,7 @@ class NewEfficientTallier(EfficientTallier):
         for process in self.unlocking_processes:
             process.join()
 
-        end: float = time.perf_counter()
-
-        print(f"Tallier total time: {end - start}")
-
         self.fvd()
+
+        end: float = time.perf_counter()
+        print(f"Tallier total time: {end - start}")

@@ -120,7 +120,11 @@ class NewGenericTallier(GenericTallier):
             self.encoded_votes.append(message['vote'])
         elif message['type'] == 'vote_bf':
             self.encoded_votes.append(message['vote'])
+
+            time1: float = time.perf_counter()
             self.bloom_filter = BloomFilter.from_dict(message['bf'])
+            time2: float = time.perf_counter()
+            print(f"Time take for Tallier to reproduce Bloom Filter {time2-time1}")
 
     def start_server(self) -> None:
         """
@@ -153,8 +157,7 @@ class NewGenericTallier(GenericTallier):
         for process in self.unlocking_processes:
             process.join()
 
-        end: float = time.perf_counter()
-
-        print(f"Tallier total time: {end - start}")
-
         self.gfvd()
+
+        end: float = time.perf_counter()
+        print(f"Tallier total time: {end - start}")

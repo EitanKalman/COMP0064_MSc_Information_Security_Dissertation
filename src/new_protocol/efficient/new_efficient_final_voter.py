@@ -38,14 +38,14 @@ class NewEfficientFinalVoter(EfficientFinalVoter):
         start: float = time.perf_counter()
 
         self.start_server()
-        time1: int = time.perf_counter()
+        time1: float = time.perf_counter()
         masking_value: int = self.generate_masking_value()
-        time2: int = time.perf_counter()
+        time2: float = time.perf_counter()
         print(f"Time taken for FinalVoter to generate masking value: {time2-time1}")
 
-        time1: int = time.perf_counter()
+        time1: float = time.perf_counter()
         encoded_vote: int = self.mask_vote(masking_value)
-        time2: int = time.perf_counter()
+        time2: float = time.perf_counter()
         print(f"Time taken for FinalVoter to mask vote: {time2-time1}")
 
         client_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

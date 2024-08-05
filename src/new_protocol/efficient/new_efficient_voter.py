@@ -86,9 +86,9 @@ class NewEfficientVoter(EfficientVoter):
         print(f"{self.voter_id} started")
         start: float = time.perf_counter()
 
-        time1: int = time.perf_counter()
+        time1: float = time.perf_counter()
         masking_value: int = self.generate_masking_value()
-        time2: int = time.perf_counter()
+        time2: float = time.perf_counter()
         print(f"Time taken for {self.voter_id} to generate masking value: {time2-time1}")
 
 
@@ -97,18 +97,18 @@ class NewEfficientVoter(EfficientVoter):
         client_socket.sendall(str(masking_value).encode())
         client_socket.close()
 
-        time1: int = time.perf_counter()
+        time1: float = time.perf_counter()
         encoded_vote: int = self.mask_vote(masking_value)
-        time2: int = time.perf_counter()
+        time2: float = time.perf_counter()
         print(f"Time taken for {self.voter_id} to mask vote: {time2-time1}")
 
         now: datetime.datetime = datetime.datetime.now()
         time_to_vote: int = int((self.vote_time - now).total_seconds())
 
-        time1: int = time.perf_counter()
+        time1: float = time.perf_counter()
         n, a, t, key, message_ciphertext, nonce = self.time_lock(encoded_vote, time_to_vote,
                                                                  self.squarings)
-        time2: int = time.perf_counter()
+        time2: float = time.perf_counter()
         print(f"Time taken for {self.voter_id} to time lock vote: {time2-time1}")
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
