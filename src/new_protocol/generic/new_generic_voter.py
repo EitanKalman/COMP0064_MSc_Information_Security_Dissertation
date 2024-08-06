@@ -9,6 +9,7 @@ import datetime
 import json
 import random
 import socket
+import time
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 from src.generic_protocols.generic_voter import GenericVoter
@@ -82,20 +83,33 @@ class NewGenericVoter(GenericVoter):
         """
         Runs the voter's operations including sending the masking value and encoded vote.
         """
+        print(f"{self.voter_id} started")
+        start: float = time.perf_counter()
+
+        time1: float = time.perf_counter()
         masking_value: int = self.generate_masking_value()
+        time2: float = time.perf_counter()
+        print(f"Time taken for {self.voter_id} to generate masking value: {time2-time1}")
+
 
         client_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.final_voter_port))
         client_socket.sendall(str(masking_value).encode())
         client_socket.close()
 
+        time1: float = time.perf_counter()
         encoded_vote: int = self.mask_vote(masking_value)
+        time2: float = time.perf_counter()
+        print(f"Time taken for {self.voter_id} to mask vote: {time2-time1}")
 
         now: datetime.datetime = datetime.datetime.now()
         time_to_vote: int = int((self.vote_time - now).total_seconds())
 
+        time1: float = time.perf_counter()
         n, a, t, key, message_ciphertext, nonce = self.time_lock(encoded_vote, time_to_vote,
                                                                  self.squarings)
+        time2: float = time.perf_counter()
+        print(f"Time taken for {self.voter_id} to time lock vote: {time2-time1}")
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
@@ -110,3 +124,7 @@ class NewGenericVoter(GenericVoter):
         }
         client_socket.sendall(json.dumps(message).encode('utf-8'))
         client_socket.close()
+
+        end: float = time.perf_counter()
+
+        print(f"{self.voter_id} total time: {end - start}")

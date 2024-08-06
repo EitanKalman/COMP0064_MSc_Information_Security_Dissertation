@@ -10,6 +10,7 @@ import itertools
 import json
 import math
 import socket
+import time
 from typing import List
 from src.bloom_filter import BloomFilter
 from src.final_voter import FinalVoter
@@ -111,11 +112,25 @@ class GenericFinalVoter(FinalVoter):
         """
         Runs the final voter operations, including sending the vote and bloom filter to the tallier.
         """
-        self.start_server()
-        masking_value: int = self.generate_masking_value()
+        print("FinalVoter started")
+        start: float = time.perf_counter()
 
+        self.start_server()
+
+        time1: float = time.perf_counter()
+        masking_value: int = self.generate_masking_value()
+        time2: float = time.perf_counter()
+        print(f"Time taken for FinalVoter to generate masking value: {time2-time1}")
+
+        time1: float = time.perf_counter()
         encoded_vote: int = self.mask_vote(masking_value)
+        time2: float = time.perf_counter()
+        print(f"Time taken for FinalVoter to mask vote: {time2-time1}")
+
+        time1: float = time.perf_counter()
         bloom_filter: BloomFilter = self.create_bloom_filter()
+        time2: float = time.perf_counter()
+        print(f"Time taken for FinalVoter to create and fill Bloom Filter: {time2-time1}")
 
         client_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', self.tallier_port))
@@ -128,3 +143,7 @@ class GenericFinalVoter(FinalVoter):
 
         client_socket.sendall(json.dumps(message).encode('utf-8'))
         client_socket.close()
+
+        end: float = time.perf_counter()
+
+        print(f"FinalVoter total time: {end - start}")

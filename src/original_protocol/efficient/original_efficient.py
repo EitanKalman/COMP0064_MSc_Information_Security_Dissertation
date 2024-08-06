@@ -22,6 +22,8 @@ def original_efficient(number_of_voters: int) -> None:
     Args:
         number_of_voters (int): The total number of voters.
     """
+    print(f"Running Original Resilient Efficient Protocol with {number_of_voters} voters")
+
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF
     final_voter_port: int = 65433
     tallier_port: int = 65432

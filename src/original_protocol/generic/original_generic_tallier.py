@@ -7,6 +7,7 @@ receive encoded votes, and compute the final verdict using a bloom filter.
 
 import json
 import socket
+import time
 from src.bloom_filter import BloomFilter
 from src.generic_protocols.generic_tallier import GenericTallier
 
@@ -46,7 +47,11 @@ class OriginalGenericTallier(GenericTallier):
             self.encoded_votes.append(message['content'])
         elif message['type'] == 'vote_bf':
             self.encoded_votes.append(message['vote'])
+
+            time1: float = time.perf_counter()
             self.bloom_filter = BloomFilter.from_dict(message['bf'])
+            time2: float = time.perf_counter()
+            print(f"Time take for Tallier to reproduce Bloom Filter {time2-time1}")
 
     def start_server(self) -> None:
         """
@@ -68,5 +73,12 @@ class OriginalGenericTallier(GenericTallier):
         """
         Runs the tallier's operations including starting the server and computing the final verdict.
         """
+        print("Tallier started")
+
+        start: float = time.perf_counter()
+
         self.start_server()
         self.gfvd()
+
+        end: float = time.perf_counter()
+        print(f"Tallier total time: {end - start}")

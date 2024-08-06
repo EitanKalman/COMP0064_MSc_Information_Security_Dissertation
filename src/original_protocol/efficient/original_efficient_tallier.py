@@ -6,6 +6,7 @@ receive encoded votes, and compute the final verdict.
 """
 
 import socket
+import time
 from src.efficient_protocols.efficient_tallier import EfficientTallier
 
 
@@ -51,14 +52,11 @@ class OriginalEfficientTallier(EfficientTallier):
         """
         Runs the tallier's operations including starting the server and computing the final verdict.
         """
+        print("Tallier started")
+
+        start: float = time.perf_counter()
         self.start_server()
         self.fvd()
+        end: float = time.perf_counter()
 
-    def get_final_verdict(self) -> int:
-        """
-        Returns the final verdict after all votes have been processed.
-
-        Returns:
-            int: The final verdict if it has been computed, otherwise None.
-        """
-        return self.final_verdict
+        print(f"Tallier total time: {end - start}")

@@ -37,7 +37,7 @@ def unlock(n: int, a: int, t: int, key: int, message_ciphertext: int, nonce: int
         x = (x ** 2) % n
     b: int = x
     second_time: float = time.perf_counter()
-    print(f"time taken: {second_time - first_time}")
+    print(f"Time taken to unlock vote: {second_time - first_time}")
     K: bytes = int.to_bytes(key - b, length=32, byteorder='big')
     cipher: ChaCha20.ChaCha20Cipher = ChaCha20.new(key=K, nonce=nonce_bytes)
     plaintext: bytes = cipher.decrypt(ciphertext)
@@ -120,7 +120,11 @@ class NewGenericTallier(GenericTallier):
             self.encoded_votes.append(message['vote'])
         elif message['type'] == 'vote_bf':
             self.encoded_votes.append(message['vote'])
+
+            time1: float = time.perf_counter()
             self.bloom_filter = BloomFilter.from_dict(message['bf'])
+            time2: float = time.perf_counter()
+            print(f"Time take for Tallier to reproduce Bloom Filter {time2-time1}")
 
     def start_server(self) -> None:
         """
@@ -145,14 +149,15 @@ class NewGenericTallier(GenericTallier):
         """
         Runs the tallier's operations including starting the server and computing the final vote.
         """
+        print("Tallier started")
+
         start: float = time.perf_counter()
         self.start_server()
 
         for process in self.unlocking_processes:
             process.join()
 
-        end: float = time.perf_counter()
-
-        print(f"total time {end - start}")
-
         self.gfvd()
+
+        end: float = time.perf_counter()
+        print(f"Tallier total time: {end - start}")
