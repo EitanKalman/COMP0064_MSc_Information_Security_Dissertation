@@ -23,9 +23,11 @@ Usage examples:
 """
 
 import argparse
+
 from src.new_protocol.efficient.new_efficient import new_efficient
 from src.new_protocol.generic.new_generic import new_generic
-from src.original_protocol.efficient.original_efficient import original_efficient
+from src.original_protocol.efficient.original_efficient import \
+    original_efficient
 from src.original_protocol.generic.original_generic import original_generic
 
 
@@ -36,6 +38,10 @@ def main() -> None:
     Raises:
         SystemExit: If an invalid combination of flags is provided.
     """
+
+    # Set the number of squarings per second the Tallier system can do here
+    squarings_per_second: int = 3000000
+
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
 
     group1: argparse._MutuallyExclusiveGroup = parser.add_mutually_exclusive_group(required=True)
@@ -78,9 +84,9 @@ def main() -> None:
     elif args.o and args.g:
         original_generic(args.n, threshold)
     elif args.dr and args.e:
-        new_efficient(args.n)
+        new_efficient(args.n, squarings_per_second)
     elif args.dr and args.g:
-        new_generic(args.n, threshold)
+        new_generic(args.n, threshold, squarings_per_second)
     else:
         print("Invalid combination of flags")
 

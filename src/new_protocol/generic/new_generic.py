@@ -10,26 +10,26 @@ import secrets
 import threading
 from random import randint
 from typing import List
+
 from src.generic_protocols.generic_final_voter import GenericFinalVoter
 from src.new_protocol.generic.new_generic_tallier import NewGenericTallier
 from src.new_protocol.generic.new_generic_voter import NewGenericVoter
 
 
-def new_generic(number_of_voters: int, threshold: int) -> None:
+def new_generic(number_of_voters: int, threshold: int, squarings_per_second: int) -> None:
     """
     Run the new generic protocol.
 
     Args:
         number_of_voters (int): The total number of voters.
         threshold (int): The threshold for computing the final verdict.
+        squarings_per_second (int): The number of squarings the Tallier system can do per second
     """
     print(f"Running Dropout Resilient Generic Protocol with {number_of_voters} voters, with a threshold of {threshold}")
 
     k_0: bytes = secrets.token_bytes(32)  # Random shared key for PRF
     final_voter_port: int = 65433
     tallier_port: int = 65432
-
-    squarings_per_second: int = 900000
 
     now: dt.datetime = dt.datetime.now()
     vote_time: dt.datetime = now + dt.timedelta(seconds=10)

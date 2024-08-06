@@ -10,17 +10,21 @@ import secrets
 import threading
 from random import randint
 from typing import List
-from src.new_protocol.efficient.new_efficient_final_voter import NewEfficientFinalVoter
-from src.new_protocol.efficient.new_efficient_tallier import NewEfficientTallier
+
+from src.new_protocol.efficient.new_efficient_final_voter import \
+    NewEfficientFinalVoter
+from src.new_protocol.efficient.new_efficient_tallier import \
+    NewEfficientTallier
 from src.new_protocol.efficient.new_efficient_voter import NewEfficientVoter
 
 
-def new_efficient(number_of_voters: int) -> None:
+def new_efficient(number_of_voters: int, squarings_per_second: int) -> None:
     """
     Run the new efficient protocol.
 
     Args:
         number_of_voters (int): The total number of voters.
+        squarings_per_second (int): The number of squarings the Tallier system can do per second
     """
     print(f"Running Dropout Resilient Efficient Protocol with {number_of_voters} voters")
 
@@ -28,7 +32,7 @@ def new_efficient(number_of_voters: int) -> None:
     final_voter_port: int = 65433
     tallier_port: int = 65432
 
-    squarings_per_second: int = 900000
+    # squarings_per_second: int = 3000000
 
     now: dt.datetime = dt.datetime.now()
     vote_time: dt.datetime = now + dt.timedelta(seconds=10)
