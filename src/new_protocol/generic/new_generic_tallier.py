@@ -124,7 +124,7 @@ class NewGenericTallier(GenericTallier):
             time1: float = time.perf_counter()
             self.bloom_filter = BloomFilter.from_dict(message['bf'])
             time2: float = time.perf_counter()
-            print(f"Time take for Tallier to reproduce Bloom Filter {time2-time1}")
+            print(f"Time take for Tallier to reproduce Bloom Filter: {time2-time1}")
 
     def start_server(self) -> None:
         """
