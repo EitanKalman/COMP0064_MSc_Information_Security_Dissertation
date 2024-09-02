@@ -3,7 +3,14 @@
 
 This is the code that accompanies the above MSc dissertation.
 
-### Running the code
+## Installation instructions
+To install and use the software in your local development environment, you must first install the required packages.  From the root of the project:
+```
+$ pip3 install -r requirements.txt
+```
+You may want to do this in a virtual environment.
+
+## Running the code
 
 Run the program (on Windows) with:
 ```
